@@ -46,7 +46,6 @@ The application uses the following environment variables, configurable via `.env
 
 ## API Endpoints
 
-1. Upload File
 - URL: /upload
 - Method: POST
 - Headers:
