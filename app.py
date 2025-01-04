@@ -115,7 +115,7 @@ def upload_file():
 
     if success:
         # Generate the URL for accessing the file
-        file_url = f"http://{APP_DOMAIN}/uploads/{file_name}"
+        file_url = f"http://{APP_DOMAIN}:5000/uploads/{file_name}"
         return jsonify({"message": f"File saved as {file_name}", "file_url": file_url}), 200
     else:
         return jsonify({"error": file_path}), 500
