@@ -28,7 +28,7 @@ chmod +x env.sh
 ./env.sh
 ```
 
-1. Run
+3. Run
 ```
 docker compose up
 ```

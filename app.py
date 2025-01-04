@@ -27,7 +27,7 @@ app.config['ENV'] = FLASK_ENV
 UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', 'uploads')
 print(f"UPLOAD_FOLDER is set to: {UPLOAD_FOLDER}")
 if not os.path.exists(UPLOAD_FOLDER):
-    raise ValueError("This folder doesn't exist.")
+    os.makedirs(UPLOAD_FOLDER)
 
 # Content-Type to File Extension mapping dictionary
 CONTENT_TYPE_MAPPING = {
