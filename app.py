@@ -15,6 +15,7 @@ if not API_KEY:
 
 # Fetch Domain from the environment variable
 APP_DOMAIN = os.getenv('APP_DOMAIN', 'localhost')
+print(f"APP_DOMAIN is set to: {APP_DOMAIN}")
 
 # Fetch Flask environment (e.g., 'production', 'development')
 FLASK_ENV = os.getenv('FLASK_ENV', 'production')  # Default to 'production' if not set
@@ -23,9 +24,10 @@ FLASK_ENV = os.getenv('FLASK_ENV', 'production')  # Default to 'production' if n
 app.config['ENV'] = FLASK_ENV
 
 # Directory where the files will be saved and served
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', 'uploads')
+print(f"UPLOAD_FOLDER is set to: {UPLOAD_FOLDER}")
 if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+    raise ValueError("This folder doesn't exist.")
 
 # Content-Type to File Extension mapping dictionary
 CONTENT_TYPE_MAPPING = {
