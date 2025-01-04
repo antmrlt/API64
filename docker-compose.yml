@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  file-retrieve-api:
+    build: .
+    container_name: file-retrieve-api
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=${FLASK_ENV}  # Fetches FLASK_ENV from .env file
+      - API_KEY=${API_KEY}  # Fetches API_KEY from .env file
+      - UPLOAD_FOLDER=${UPLOAD_FOLDER} # Fetches UPLOAD_FOLDER from .env file
+    volumes:
+      - .:/app
+    restart: unless-stopped
