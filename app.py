@@ -3,6 +3,7 @@ import base64
 import os
 import time
 import uuid
+import hashlib
 
 app = Flask(__name__)
 
@@ -89,6 +90,23 @@ def save_base64_to_file(base64_string, file_name):
     except Exception as e:
         return False, str(e)
 
+# Error handling
+@app.errorhandler(400)
+def bad_request(e):
+    return jsonify({"error": "Bad Request", "message": str(e)}), 400
+
+@app.errorhandler(404)
+def not_found(e):
+    return jsonify({"error": "Not Found", "message": "The requested resource could not be found."}), 404
+
+@app.errorhandler(500)
+def internal_error(e):
+    return jsonify({"error": "Internal Server Error", "message": "An unexpected error occurred."}), 500
+
+@app.errorhandler(Exception)
+def handle_unexpected_error(e):
+    return jsonify({"error": "Unexpected Error", "message": "Something went wrong on the server."}), 500
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     # Get API key and check if it's valid
@@ -103,6 +121,11 @@ def upload_file():
     
     base64_string = data['base64_string']
     content_type = data['content_type']
+
+    # Handle the sha256 parameter, default to False if not provided
+    sha256_requested = data.get('sha256', False)
+    if not isinstance(sha256_requested, bool):
+        return jsonify({"error": "'sha256' should be a boolean (true or false)."}), 400
     
     # Determine the correct file extension based on the content_type using the dictionary
     file_extension = get_file_extension(content_type)
@@ -114,9 +137,24 @@ def upload_file():
     success, file_path = save_base64_to_file(base64_string, file_name)
 
     if success:
-        # Generate the URL for accessing the file
-        file_url = f"http://{APP_DOMAIN}:5000/uploads/{file_name}"
-        return jsonify({"message": f"File saved as {file_name}", "file_url": file_url}), 200
+        # Build the response
+        response = {
+            "message": f"File saved as {file_name}",
+            "file_url": f"http://{APP_DOMAIN}:5000/uploads/{file_name}",
+        }
+
+        # Calculate SHA256 if requested
+        if sha256_requested:
+            try:
+                sha256_hash = hashlib.sha256()
+                with open(file_path, "rb") as f:
+                    for chunk in iter(lambda: f.read(4096), b""):
+                        sha256_hash.update(chunk)
+                response["file_sha256"] = sha256_hash.hexdigest()
+            except Exception as e:
+                return jsonify({"error": f"Error calculating SHA256: {str(e)}"}), 500
+
+        return jsonify(response), 200
     else:
         return jsonify({"error": file_path}), 500
 
